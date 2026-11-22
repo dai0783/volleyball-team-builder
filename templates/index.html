@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}班を構成する{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">TEAM SETUP</p>
+  <h1>参加者から班を構成する</h1>
+  <p>LINEの名前を1行に1人ずつ入力してください。会員リストの情報と履歴を使って構成します。</p>
+</section>
+
+<div class="status-row" aria-label="登録状況">
+  <span>会員 {{ member_count }}人</span>
+  <span>保存済み履歴 {{ history_count }}件</span>
+</div>
+
+{% if errors %}
+<section class="error-box" aria-labelledby="input-errors">
+  <h2 id="input-errors">入力を確認してください</h2>
+  <ul>
+    {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<form class="panel form-stack" method="post" action="{{ url_for('web.compose') }}">
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+
+  <label class="field">
+    <span>イベント名 <small>任意</small></span>
+    <input name="event_name" type="text" value="{{ state.event_name }}" placeholder="例：新歓交流会">
+  </label>
+
+  <label class="field">
+    <span>LINEの名前</span>
+    <textarea name="line_names" rows="12" required placeholder="山本&#10;たろう&#10;YAMADA">{{ state.line_names }}</textarea>
+    <small>表記は会員リストと同じにしてください。空白・全角半角・英字の大文字小文字は調整して照合します。</small>
+  </label>
+
+  <fieldset>
+    <legend>分け方</legend>
+    <div class="choice-grid">
+      <label class="choice">
+        <input type="radio" name="group_mode" value="team_size" {% if state.group_mode != 'team_count' %}checked{% endif %}>
+        <span>1チームの人数を指定</span>
+      </label>
+      <label class="choice">
+        <input type="radio" name="group_mode" value="team_count" {% if state.group_mode == 'team_count' %}checked{% endif %}>
+        <span>チーム数を指定</span>
+      </label>
+    </div>
+    <label class="field field--short">
+      <span>人数またはチーム数</span>
+      <input name="group_value" type="number" min="1" max="100" value="{{ state.group_value }}" required>
+    </label>
+  </fieldset>
+
+  <fieldset>
+    <legend>優先順位</legend>
+    <p class="field-note">数字が大きい項目を強く優先します。0にすると判定に使いません。</p>
+    <div class="priority-grid">
+      {% set priority_fields = [
+        ('experience', '経験年数を均等に'),
+        ('department', '学部をばらつかせる'),
+        ('grade', '回生をばらつかせる'),
+        ('gender', '男女比を近づける'),
+        ('history', '過去と違う組み合わせ')
+      ] %}
+      {% for key, label in priority_fields %}
+      <label class="field">
+        <span>{{ label }}</span>
+        <select name="weight_{{ key }}">
+          {% set selected_value = state['weight_' ~ key]|int %}
+          {% for value, text in [(0,'0｜使わない'),(1,'1｜低'),(2,'2'),(3,'3｜中'),(4,'4'),(5,'5｜最優先')] %}
+          <option value="{{ value }}" {% if selected_value == value %}selected{% endif %}>{{ text }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      {% endfor %}
+    </div>
+    <p class="field-note">性別が未登録の会員は、名前から推測せず「未登録」として扱います。</p>
+  </fieldset>
+
+  <button class="primary-button" type="submit">チームを構成する</button>
+</form>
+{% endblock %}

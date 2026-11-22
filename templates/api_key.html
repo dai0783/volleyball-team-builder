@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}APIキー入力{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">API KEY</p>
+  <h1>APIキー入力</h1>
+  <p>現在の班編成は端末内のロジックだけで動作するため、APIキーは不要です。将来AI補助を追加する場合の入力欄です。</p>
+</section>
+
+<section class="panel form-stack">
+  <div class="key-status">
+    <strong>現在の状態</strong>
+    <span>{{ 'この実行中のみ保持しています' if key_saved else '保存されていません' }}</span>
+  </div>
+  <p>キーはSQLite・CSV・ブラウザCookieには保存しません。Pythonサーバーを終了すると消えます。</p>
+  <form class="form-stack" method="post">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="save">
+    <label class="field">
+      <span>OpenAI APIキー</span>
+      <input type="password" name="api_key" autocomplete="off" placeholder="sk-...">
+    </label>
+    <button class="primary-button" type="submit">この実行中だけ保持する</button>
+  </form>
+  {% if key_saved %}
+  <form method="post">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="clear">
+    <button class="secondary-button" type="submit">APIキーを削除する</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

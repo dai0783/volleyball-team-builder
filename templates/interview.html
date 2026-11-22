@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}会員インタビューフォーム{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">MEMBER FORM</p>
+  <h1>会員インタビューフォーム</h1>
+  <p>不足している会員情報を追加できます。同じLINE名がある場合は、その会員情報を更新します。</p>
+</section>
+
+{% if external_url %}
+<p><a class="secondary-button" href="{{ external_url }}" target="_blank" rel="noreferrer">Googleフォームを開く</a></p>
+{% endif %}
+
+<form class="panel form-grid" method="post">
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+  <label class="field"><span>LINEの名前</span><input name="line_name" required value="{{ form.get('line_name', '') }}"></label>
+  <label class="field"><span>氏名</span><input name="full_name" value="{{ form.get('full_name', '') }}"></label>
+  <label class="field"><span>学部</span><input name="department" value="{{ form.get('department', '') }}"></label>
+  <label class="field"><span>学籍番号</span><input name="student_id" inputmode="numeric" value="{{ form.get('student_id', '') }}"></label>
+  <label class="field"><span>回生</span><input name="grade" type="number" min="1" max="20" value="{{ form.get('grade', '') }}"></label>
+  <label class="field"><span>バレーボール経験（年）</span><input name="experience" type="number" min="0" max="80" step="0.5" value="{{ form.get('experience', '') }}"></label>
+  <label class="field"><span>出身地</span><input name="birthplace" value="{{ form.get('birthplace', '') }}"></label>
+  <label class="field"><span>誕生日</span><input name="birthday" value="{{ form.get('birthday', '') }}" placeholder="2005年1月1日"></label>
+  <label class="field">
+    <span>性別</span>
+    <select name="gender">
+      {% set gender = form.get('gender', '') %}
+      <option value="" {% if not gender %}selected{% endif %}>未登録</option>
+      <option value="男性" {% if gender == '男性' %}selected{% endif %}>男性</option>
+      <option value="女性" {% if gender == '女性' %}selected{% endif %}>女性</option>
+      <option value="その他・回答しない" {% if gender == 'その他・回答しない' %}selected{% endif %}>その他・回答しない</option>
+    </select>
+  </label>
+  <label class="field"><span>役職</span><input name="role" value="{{ form.get('role', '') }}"></label>
+  <button class="primary-button form-grid__full" type="submit">会員リストに保存する</button>
+</form>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}チーム構成履歴{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">HISTORY</p>
+  <h1>チーム構成履歴</h1>
+  <p>ここに保存された組み合わせを、次回以降の班編成で避けるように計算します。</p>
+</section>
+
+{% if formations %}
+<div class="history-list">
+  {% for formation in formations %}
+  <article class="panel history-item">
+    <div class="section-heading">
+      <div>
+        <h2>{{ formation.event_name or ('保存履歴 ' ~ formation.id) }}</h2>
+        <p class="team-meta">{{ formation.created_at }}</p>
+      </div>
+      <button class="secondary-button" type="button" data-copy-target="history-{{ formation.id }}">コピー</button>
+    </div>
+    <textarea id="history-{{ formation.id }}" rows="{{ [formation.output_text.count('\n') + 2, 8]|max }}" readonly>{{ formation.output_text }}</textarea>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <h2>保存済みの履歴はありません</h2>
+  <p>構成結果画面で「チームを決定して履歴に保存する」を押すと追加されます。</p>
+  <a class="secondary-button" href="{{ url_for('web.index') }}">班を構成する</a>
+</div>
+{% endif %}
+{% endblock %}

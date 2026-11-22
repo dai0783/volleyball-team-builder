@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}構成結果{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">RESULT</p>
+  <h1>チーム構成結果</h1>
+  <p>この時点では履歴に保存されていません。内容を確認して決定してください。</p>
+</section>
+
+<section class="panel copy-panel">
+  <div class="section-heading">
+    <h2>コピー用テキスト</h2>
+    <button class="secondary-button" type="button" data-copy-target="team-output">コピー</button>
+  </div>
+  <textarea id="team-output" rows="{{ [draft.output_text.count('\n') + 2, 12]|max }}" readonly>{{ draft.output_text }}</textarea>
+</section>
+
+<section class="team-grid" aria-label="チーム詳細">
+  {% for team in teams %}
+  {% set summary = summaries[loop.index0] %}
+  <article class="team-card">
+    <h2>チーム{{ loop.index }}</h2>
+    <p class="team-meta">{{ team|length }}人／経験平均 {{ summary.average_experience }}年</p>
+    <p class="team-meta">男性 {{ summary.male }}・女性 {{ summary.female }}・未登録等 {{ summary.unknown }}</p>
+    <table>
+      <thead><tr><th>LINE</th><th>経験</th><th>学部</th><th>回生</th></tr></thead>
+      <tbody>
+        {% for member in team %}
+        <tr>
+          <td>{{ member.line_name }}</td>
+          <td>{{ member.experience }}年</td>
+          <td>{{ member.department or '未登録' }}</td>
+          <td>{{ (member.grade ~ '回生') if member.grade else '未登録' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </article>
+  {% endfor %}
+</section>
+
+<div class="result-actions">
+  <form method="post" action="{{ url_for('web.regenerate', draft_id=draft.id) }}">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <button class="secondary-button full-button" type="submit">履歴に残さずもう一度構成する</button>
+  </form>
+  <form method="post" action="{{ url_for('web.save_result', draft_id=draft.id) }}">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <button class="primary-button full-button" type="submit">チームを決定して履歴に保存する</button>
+  </form>
+</div>
+{% endblock %}

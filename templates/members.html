@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}会員リスト{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">MEMBERS</p>
+  <h1>会員リスト</h1>
+  <p>Googleスプレッドシートから書き出したCSVを読み込めます。同じLINE名は最新のCSV内容で更新します。</p>
+</section>
+
+<section class="panel form-stack">
+  <h2>CSVを読み込む</h2>
+  <form class="inline-form" method="post" action="{{ url_for('web.members_import') }}" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <label class="file-field">
+      <span>CSVファイル</span>
+      <input type="file" name="csv_file" accept=".csv,text/csv" required>
+    </label>
+    <button class="primary-button" type="submit">読み込む</button>
+  </form>
+  <p class="field-note">必要列：LINEの名前。推奨列：名前、学部、学籍番号、回生、バレーボール経験、性別。</p>
+</section>
+
+<div class="list-tools">
+  <form class="search-form" method="get">
+    <label class="field">
+      <span>検索</span>
+      <input type="search" name="q" value="{{ query }}" placeholder="LINE名・氏名・学部・学籍番号">
+    </label>
+    <button class="secondary-button" type="submit">検索</button>
+  </form>
+  <a class="secondary-button" href="{{ url_for('web.members_export') }}">現在のリストをCSV出力</a>
+</div>
+
+<section class="table-frame" aria-label="会員一覧">
+  <table class="member-table">
+    <thead>
+      <tr><th>LINE</th><th>氏名</th><th>学部</th><th>回生</th><th>経験</th><th>性別</th></tr>
+    </thead>
+    <tbody>
+      {% for member in members %}
+      <tr>
+        <td>{{ member.line_name }}</td>
+        <td>{{ member.full_name or '—' }}</td>
+        <td>{{ member.department or '—' }}</td>
+        <td>{{ (member.grade ~ '回生') if member.grade else '—' }}</td>
+        <td>{{ member.experience }}年</td>
+        <td>{{ member.gender or '未登録' }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6">該当する会員はいません。</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
