@@ -2,6 +2,8 @@
 
 Googleスプレッドシートから出力したCSVを読み込み、LINEの名前で参加者を指定して班を構成するローカルWebアプリです。
 
+使用技術、ライブラリ、システム構成図、データベース構成、処理フローは[技術構成・システム設計](docs/TECHNICAL_OVERVIEW.md)にまとめています。
+
 ## 主な機能
 
 - LINEの名前を1行に1人ずつ入力して会員情報を参照
@@ -93,3 +95,4 @@ python run.py
 ```powershell
 python -m unittest discover -s tests -v
 ```
+
